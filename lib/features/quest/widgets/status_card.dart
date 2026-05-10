@@ -5,8 +5,8 @@ import 'package:tri_task/core/theme/app_colors.dart';
 import 'package:tri_task/core/theme/app_text_styles.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/providers/user_status_provider.dart';
+import 'package:tri_task/widgets/command_window.dart';
 import 'package:tri_task/widgets/exp_bar.dart';
-import 'package:tri_task/widgets/parchment_card.dart';
 
 class StatusCard extends ConsumerWidget {
   const StatusCard({super.key});
@@ -15,7 +15,7 @@ class StatusCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userStatusNotifierProvider);
 
-    return ParchmentCard(
+    return CommandWindow(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -25,13 +25,12 @@ class StatusCard extends ConsumerWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.gold.withValues(alpha: 0.15),
+                  color: AppColors.gold.withValues(alpha: 0.2),
                   border: Border.all(color: AppColors.gold, width: 2),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
                 child: const Icon(
                   Icons.person_rounded,
-                  color: AppColors.brown,
+                  color: AppColors.gold,
                   size: 32,
                 ),
               ),
@@ -40,9 +39,19 @@ class StatusCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('冒険者', style: AppTextStyles.statLabel),
+                    Text(
+                      'ぼうけんしゃ',
+                      style: AppTextStyles.statLabel.copyWith(
+                        color: AppColors.cream.withValues(alpha: 0.7),
+                      ),
+                    ),
                     const SizedBox(height: AppTheme.spacingXs),
-                    Text('Lv. ${user.level}', style: AppTextStyles.statValue),
+                    Text(
+                      'Lv. ${user.level}',
+                      style: AppTextStyles.statValue.copyWith(
+                        color: AppColors.gold,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -53,6 +62,7 @@ class StatusCard extends ConsumerWidget {
           ExpBar(
             currentExp: user.exp,
             maxExp: ExpConstants.expPerLevel,
+            onDark: true,
           ),
         ],
       ),
@@ -73,9 +83,8 @@ class _StreakBadge extends StatelessWidget {
         vertical: AppTheme.spacingXs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.gold.withValues(alpha: 0.18),
-        border: Border.all(color: AppColors.gold, width: 1.5),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        color: AppColors.gold,
+        border: Border.all(color: AppColors.cream, width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -88,9 +97,9 @@ class _StreakBadge extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             '$streakDays日',
-            style: AppTextStyles.bodyMedium.copyWith(
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.statLabel.copyWith(
               color: AppColors.brown,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],

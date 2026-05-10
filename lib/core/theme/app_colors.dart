@@ -13,6 +13,7 @@ class AppColors {
 
   static const Color background = navy;
   static const Color surface = cream;
+  static const Color windowBg = Color(0xFF24305A); // navyより少し明るいJRPGコマンドウィンドウ背景
   static const Color textPrimary = brown;
   static const Color textSecondary = Color(0xFF8B6F47);
   static const Color textOnDark = cream;

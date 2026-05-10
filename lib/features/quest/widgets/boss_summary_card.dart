@@ -4,8 +4,8 @@ import 'package:tri_task/core/theme/app_colors.dart';
 import 'package:tri_task/core/theme/app_text_styles.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/providers/boss_provider.dart';
+import 'package:tri_task/widgets/command_window.dart';
 import 'package:tri_task/widgets/hp_bar.dart';
-import 'package:tri_task/widgets/parchment_card.dart';
 
 class BossSummaryCard extends ConsumerWidget {
   const BossSummaryCard({super.key});
@@ -14,14 +14,19 @@ class BossSummaryCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final boss = ref.watch(bossNotifierProvider);
 
-    return ParchmentCard(
+    return CommandWindow(
       borderColor: AppColors.purple,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Text('今週のボス', style: AppTextStyles.statLabel),
+              Text(
+                '▼ こんしゅうのボス',
+                style: AppTextStyles.statLabel.copyWith(
+                  color: AppColors.purple,
+                ),
+              ),
               const Spacer(),
               if (boss.defeated) const _DefeatedBadge(),
             ],
@@ -33,9 +38,8 @@ class BossSummaryCard extends ConsumerWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: AppColors.purple.withValues(alpha: 0.15),
+                  color: AppColors.purple.withValues(alpha: 0.25),
                   border: Border.all(color: AppColors.purple, width: 2),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
                 child: const Icon(
                   Icons.castle_rounded,
@@ -50,7 +54,9 @@ class BossSummaryCard extends ConsumerWidget {
                   children: [
                     Text(
                       boss.name,
-                      style: AppTextStyles.titleMedium,
+                      style: AppTextStyles.titleMedium.copyWith(
+                        color: AppColors.cream,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -58,6 +64,7 @@ class BossSummaryCard extends ConsumerWidget {
                     HpBar(
                       currentHp: boss.currentHp,
                       maxHp: boss.maxHp,
+                      onDark: true,
                     ),
                   ],
                 ),
@@ -82,14 +89,13 @@ class _DefeatedBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.gold,
-        border: Border.all(color: AppColors.brown, width: 1.5),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        border: Border.all(color: AppColors.cream, width: 1.5),
       ),
       child: Text(
-        '討伐！',
-        style: AppTextStyles.caption.copyWith(
-          fontWeight: FontWeight.bold,
+        'とうばつ！',
+        style: AppTextStyles.statLabel.copyWith(
           color: AppColors.brown,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );

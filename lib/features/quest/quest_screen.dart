@@ -162,10 +162,7 @@ class _SectionTitle extends StatelessWidget {
           Container(
             width: 4,
             height: 18,
-            decoration: BoxDecoration(
-              color: AppColors.gold,
-              borderRadius: BorderRadius.circular(2),
-            ),
+            color: AppColors.gold,
           ),
           const SizedBox(width: AppTheme.spacingSm),
           Text(

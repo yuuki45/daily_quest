@@ -467,6 +467,25 @@ MVPは網羅率より**核となるロジックの正しさ**を優先。
 
 ---
 
+## 10.5. 既知のテスト制約
+
+**QuestScreen を pumpWidget する統合 widget test は未実装。**
+
+理由: `runApp(ProviderScope(child: DailyQuestApp()))` を tester.pumpWidget に流すと、
+`google_fonts` の async フォント解決と Hive の Future が flutter_test の
+フェイクタイマー内で resolve せず、テストが10分でタイムアウトする。
+`GoogleFonts.config.allowRuntimeFetching = false` も `tester.runAsync` も効果なし。
+
+代わりの対処:
+- ロジック層は providers/ 配下のユニットテストでカバー (30本)
+- 共通 widgets/ は単体 widget test でカバー (11本)
+- 画面統合は Step 8 の手動QAで確認
+- widget_test.dart はテーマ構築の最小スモークのみ実装
+
+将来的な解決案 (Phase 2 以降):
+- `integration_test` パッケージで実機/エミュレータで起動確認する
+- google_fonts を bundled font に置き換える
+
 ## 11. リスクと対処
 
 | リスク | 対処 |

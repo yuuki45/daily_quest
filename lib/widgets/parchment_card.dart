@@ -13,6 +13,7 @@ class ParchmentCard extends StatelessWidget {
   final double? borderRadius;
   final double? borderWidth;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   const ParchmentCard({
     required this.child,
@@ -24,6 +25,7 @@ class ParchmentCard extends StatelessWidget {
     this.borderRadius,
     this.borderWidth,
     this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -44,18 +46,20 @@ class ParchmentCard extends StatelessWidget {
       child: child,
     );
 
+    final interactive = onTap != null || onLongPress != null;
     return Padding(
       padding: margin,
-      child: onTap == null
-          ? body
-          : Material(
+      child: interactive
+          ? Material(
               color: Colors.transparent,
               child: InkWell(
                 onTap: onTap,
+                onLongPress: onLongPress,
                 borderRadius: br,
                 child: body,
               ),
-            ),
+            )
+          : body,
     );
   }
 }

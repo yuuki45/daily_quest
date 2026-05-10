@@ -1,5 +1,5 @@
 name: tri_task
-description: "TriTask - 毎日3つのタスクに集中する習慣化支援アプリ"
+description: "Daily Quest - 毎日のタスクを冒険に変える習慣化アプリ"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 2.0.0+2
 
 environment:
   sdk: ^3.8.1
@@ -50,16 +50,14 @@ dependencies:
   # UI/UX
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.0
-  confetti: ^0.7.0
-
-  # SNS share
-  url_launcher: ^6.3.1
+  table_calendar: ^3.1.2
 
   # Utilities
   uuid: ^4.5.1
   intl: ^0.19.0
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:
@@ -73,7 +71,6 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
   # Code generation
-  hive_generator: ^2.0.1
   build_runner: ^2.4.13
   freezed: ^2.5.7
   json_serializable: ^6.8.0

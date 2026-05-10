@@ -13,4 +13,5 @@ class AppConstants {
 
   static const String prefsKeyV2Migrated = 'v2_migrated';
   static const String prefsKeyAnnounceShown = 'remake_announce_shown';
+  static const String prefsKeyNotificationsEnabled = 'notifications_enabled';
 }

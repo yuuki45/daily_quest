@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tri_task/core/constants/app_constants.dart';
 import 'package:tri_task/core/theme/app_colors.dart';
 import 'package:tri_task/core/theme/app_text_styles.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
@@ -9,6 +11,7 @@ import 'package:tri_task/providers/quest_provider.dart';
 import 'package:tri_task/providers/record_provider.dart';
 import 'package:tri_task/providers/user_status_provider.dart';
 import 'package:tri_task/services/hive_service.dart';
+import 'package:tri_task/services/notification_service.dart';
 import 'package:tri_task/widgets/parchment_card.dart';
 import 'package:tri_task/widgets/screen_header.dart';
 
@@ -31,6 +34,13 @@ class SettingsScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const ScreenHeader(title: '設定'),
+              const SizedBox(height: AppTheme.spacingLg),
+              const _SectionLabel(text: '通知'),
+              const SizedBox(height: AppTheme.spacingSm),
+              const ParchmentCard(
+                padding: EdgeInsets.zero,
+                child: _NotificationToggle(),
+              ),
               const SizedBox(height: AppTheme.spacingLg),
               const _SectionLabel(text: 'データ'),
               const SizedBox(height: AppTheme.spacingSm),
@@ -146,6 +156,102 @@ class SettingsScreen extends ConsumerWidget {
       SnackBar(
         content: Text('$label は準備中です', style: AppTextStyles.bodyMedium),
         backgroundColor: AppColors.brown,
+      ),
+    );
+  }
+}
+
+class _NotificationToggle extends StatefulWidget {
+  const _NotificationToggle();
+
+  @override
+  State<_NotificationToggle> createState() => _NotificationToggleState();
+}
+
+class _NotificationToggleState extends State<_NotificationToggle> {
+  bool? _enabled;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _enabled =
+          prefs.getBool(AppConstants.prefsKeyNotificationsEnabled) ?? true;
+    });
+  }
+
+  Future<void> _toggle(bool value) async {
+    setState(() => _enabled = value);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(AppConstants.prefsKeyNotificationsEnabled, value);
+
+    if (value) {
+      final granted = await NotificationService.requestPermissions();
+      if (granted) {
+        await NotificationService.scheduleDailyReminder();
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '通知が許可されませんでした。端末の設定から有効にしてください。',
+              style: AppTextStyles.bodyMedium,
+            ),
+            backgroundColor: AppColors.brown,
+          ),
+        );
+      }
+    } else {
+      await NotificationService.cancelDailyReminder();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final value = _enabled;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingMd,
+        vertical: AppTheme.spacingSm,
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.notifications_outlined,
+              color: AppColors.brown, size: 22),
+          const SizedBox(width: AppTheme.spacingMd),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('21:00 にリマインド', style: AppTextStyles.titleMedium),
+                const SizedBox(height: 2),
+                Text(
+                  '毎日21時に「冒険を記録しよう」と通知',
+                  style: AppTextStyles.caption,
+                ),
+              ],
+            ),
+          ),
+          if (value == null)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            Switch.adaptive(
+              value: value,
+              onChanged: _toggle,
+              activeThumbColor: AppColors.gold,
+              activeTrackColor: AppColors.gold.withValues(alpha: 0.4),
+            ),
+        ],
       ),
     );
   }

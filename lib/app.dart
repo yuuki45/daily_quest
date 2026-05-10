@@ -2,20 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:tri_task/core/constants/app_constants.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/features/main_scaffold.dart';
+import 'package:tri_task/features/onboarding/remake_announce_screen.dart';
 
-class DailyQuestApp extends StatelessWidget {
+class DailyQuestApp extends StatefulWidget {
   final bool showRemakeAnnounce;
 
   const DailyQuestApp({super.key, this.showRemakeAnnounce = false});
 
   @override
+  State<DailyQuestApp> createState() => _DailyQuestAppState();
+}
+
+class _DailyQuestAppState extends State<DailyQuestApp> {
+  late bool _showAnnounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _showAnnounce = widget.showRemakeAnnounce;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // TODO(phase1): showRemakeAnnounce が true の場合はリニューアル告知画面 (Step 7) を表示
     return MaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      home: const MainScaffold(),
+      home: _showAnnounce
+          ? RemakeAnnounceScreen(
+              onContinue: () => setState(() => _showAnnounce = false),
+            )
+          : const MainScaffold(),
     );
   }
 }

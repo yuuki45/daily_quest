@@ -1,4 +1,12 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:tri_task/data/adapters/adventure_record_adapter.dart';
+import 'package:tri_task/data/adapters/boss_adapter.dart';
+import 'package:tri_task/data/adapters/quest_adapter.dart';
+import 'package:tri_task/data/adapters/user_status_adapter.dart';
+import 'package:tri_task/data/models/adventure_record.dart';
+import 'package:tri_task/data/models/boss.dart';
+import 'package:tri_task/data/models/quest.dart';
+import 'package:tri_task/data/models/user_status.dart';
 
 class HiveService {
   HiveService._();
@@ -17,15 +25,15 @@ class HiveService {
 
     await Hive.initFlutter();
 
-    // TypeAdapter登録は Step 2 でモデル作成後に追加する。
-    //   Hive.registerAdapter(QuestAdapter());
-    //   Hive.registerAdapter(UserStatusAdapter());
-    //   Hive.registerAdapter(BossAdapter());
-    //   Hive.registerAdapter(AdventureRecordAdapter());
+    Hive.registerAdapter(QuestAdapter());
+    Hive.registerAdapter(UserStatusAdapter());
+    Hive.registerAdapter(BossAdapter());
+    Hive.registerAdapter(AdventureRecordAdapter());
 
-    // Box open も Step 2 で追加する。
-    //   await Hive.openBox<Quest>(questsBoxName);
-    //   ...
+    await Hive.openBox<Quest>(questsBoxName);
+    await Hive.openBox<UserStatus>(userStatusBoxName);
+    await Hive.openBox<Boss>(bossesBoxName);
+    await Hive.openBox<AdventureRecord>(recordsBoxName);
 
     _initialized = true;
   }

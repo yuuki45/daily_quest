@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:tri_task/core/theme/app_colors.dart';
 
 class AppTheme {
@@ -18,9 +17,7 @@ class AppTheme {
   static const double minTapSize = 48.0;
 
   static ThemeData get dark {
-    final base = ThemeData.dark(useMaterial3: true);
-
-    return base.copyWith(
+    return ThemeData.dark(useMaterial3: true).copyWith(
       scaffoldBackgroundColor: AppColors.background,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.accent,
@@ -29,15 +26,9 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
         error: AppColors.accentRed,
       ),
-      textTheme:
-          GoogleFonts.mPlus1TextTheme(base.textTheme).apply(
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
-      ),
     );
   }
 
-  /// 旧コードが `AppTheme.light` を参照しているため互換維持。
-  /// 内部は実質ダーク (P3風) テーマ。
+  /// 旧コード互換 (内部はダークテーマ)。
   static ThemeData get light => dark;
 }

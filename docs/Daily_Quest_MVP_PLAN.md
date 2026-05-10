@@ -126,6 +126,11 @@ class AdventureRecord {
 - `bosses` (Box<Boss>) — keyはweekStartDate
 - `records` (Box<AdventureRecord>) — keyはdate
 
+### Hive TypeAdapter方針
+`hive_generator` は `riverpod_generator` とSDK依存が衝突するため使わない。
+旧アプリと同様、各モデル用のアダプタを `data/adapters/` 配下に**手書き**で実装する。
+モデルが4つだけなので保守コストは許容範囲。
+
 ---
 
 ## 3. ロジック仕様

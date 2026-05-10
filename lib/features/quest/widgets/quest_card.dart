@@ -6,7 +6,7 @@ import 'package:tri_task/core/theme/app_text_styles.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/data/models/quest.dart';
 import 'package:tri_task/providers/quest_provider.dart';
-import 'package:tri_task/widgets/command_window.dart';
+import 'package:tri_task/widgets/slab_card.dart';
 
 class QuestCard extends ConsumerWidget {
   final Quest quest;
@@ -17,9 +17,15 @@ class QuestCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return CommandWindow(
-      borderColor: _isMain ? AppColors.gold : AppColors.cream,
-      borderWidth: _isMain ? 3.5 : 2.5,
+    final accentColor = _isMain ? AppColors.accentYellow : AppColors.accent;
+
+    return SlabCard(
+      accentColor: accentColor,
+      accentWidth: _isMain ? 5 : 3,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingLg,
+        vertical: AppTheme.spacingMd,
+      ),
       onTap: () async {
         await HapticFeedback.selectionClick();
         await ref.read(questNotifierProvider.notifier).toggleComplete(quest.id);
@@ -28,35 +34,53 @@ class QuestCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (_isMain) const _MainBadge(),
-          if (_isMain) const SizedBox(height: AppTheme.spacingSm),
           Row(
             children: [
-              if (_isMain && !quest.isCompleted)
-                Padding(
-                  padding: const EdgeInsets.only(right: 4),
+              Text(
+                _isMain ? 'MAIN  QUEST' : 'SIDE  QUEST',
+                style: AppTextStyles.statLabel.copyWith(
+                  color: accentColor,
+                  fontSize: _isMain ? 11 : 10,
+                ),
+              ),
+              if (quest.isCompleted) ...[
+                const SizedBox(width: AppTheme.spacingSm),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentGreen.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                   child: Text(
-                    '▶',
-                    style: AppTextStyles.statValue.copyWith(
-                      color: AppColors.gold,
-                      fontSize: 18,
+                    'CLEAR',
+                    style: AppTextStyles.statLabel.copyWith(
+                      color: AppColors.accentGreen,
+                      fontSize: 9,
                     ),
                   ),
                 ),
-              _CheckBox(checked: quest.isCompleted),
+              ],
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacingSm),
+          Row(
+            children: [
+              _CheckBox(checked: quest.isCompleted, accent: accentColor),
               const SizedBox(width: AppTheme.spacingMd),
               Expanded(
                 child: Text(
                   quest.title,
                   style: AppTextStyles.questTitle.copyWith(
                     color: quest.isCompleted
-                        ? AppColors.cream.withValues(alpha: 0.45)
-                        : AppColors.cream,
+                        ? AppColors.textMuted
+                        : AppColors.textPrimary,
                     decoration: quest.isCompleted
                         ? TextDecoration.lineThrough
                         : null,
-                    decorationColor:
-                        AppColors.cream.withValues(alpha: 0.45),
+                    decorationColor: AppColors.textMuted,
                   ),
                 ),
               ),
@@ -72,34 +96,42 @@ class QuestCard extends ConsumerWidget {
     if (!context.mounted) return;
     final action = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: AppColors.windowBg,
-      shape: const Border(
-        top: BorderSide(color: AppColors.gold, width: 3),
-        left: BorderSide(color: AppColors.gold, width: 3),
-        right: BorderSide(color: AppColors.gold, width: 3),
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (sheetCtx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: AppTheme.spacingSm),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.textMuted,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingMd),
             ListTile(
               leading:
-                  const Icon(Icons.delete_outline, color: AppColors.crimson),
+                  const Icon(Icons.delete_outline, color: AppColors.accentRed),
               title: Text(
                 'クエストを削除',
                 style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.crimson,
+                  color: AppColors.accentRed,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               onTap: () => Navigator.of(sheetCtx).pop('delete'),
             ),
             ListTile(
-              leading: const Icon(Icons.close, color: AppColors.cream),
+              leading:
+                  const Icon(Icons.close, color: AppColors.textSecondary),
               title: Text(
                 'キャンセル',
-                style:
-                    AppTextStyles.bodyLarge.copyWith(color: AppColors.cream),
+                style: AppTextStyles.bodyLarge,
               ),
               onTap: () => Navigator.of(sheetCtx).pop(),
             ),
@@ -114,55 +146,31 @@ class QuestCard extends ConsumerWidget {
   }
 }
 
-class _MainBadge extends StatelessWidget {
-  const _MainBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacingSm,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.gold,
-        border: Border.all(color: AppColors.cream, width: 1.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.star_rounded, size: 14, color: AppColors.brown),
-          const SizedBox(width: 4),
-          Text(
-            'メインクエスト',
-            style: AppTextStyles.statLabel.copyWith(
-              color: AppColors.brown,
-              fontWeight: FontWeight.bold,
-              fontSize: 11,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _CheckBox extends StatelessWidget {
   final bool checked;
+  final Color accent;
 
-  const _CheckBox({required this.checked});
+  const _CheckBox({required this.checked, required this.accent});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 26,
-      height: 26,
+      width: 24,
+      height: 24,
       decoration: BoxDecoration(
-        color: checked ? AppColors.gold : AppColors.windowBg,
-        border: Border.all(color: AppColors.cream, width: 2),
+        color: checked ? accent : Colors.transparent,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: checked ? accent : AppColors.textMuted,
+          width: 2,
+        ),
       ),
       child: checked
-          ? const Icon(Icons.check_rounded, size: 18, color: AppColors.brown)
+          ? const Icon(
+              Icons.check_rounded,
+              size: 16,
+              color: AppColors.textOnAccent,
+            )
           : null,
     );
   }

@@ -6,9 +6,9 @@ import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/data/models/boss.dart';
 import 'package:tri_task/data/repositories/boss_repository.dart';
 import 'package:tri_task/providers/boss_provider.dart';
-import 'package:tri_task/widgets/command_window.dart';
 import 'package:tri_task/widgets/hp_bar.dart';
 import 'package:tri_task/widgets/screen_header.dart';
+import 'package:tri_task/widgets/slab_card.dart';
 
 class BossScreen extends ConsumerWidget {
   const BossScreen({super.key});
@@ -19,26 +19,27 @@ class BossScreen extends ConsumerWidget {
     final defeatedBosses = BossRepository().getDefeated();
 
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
+            AppTheme.spacingLg,
             AppTheme.spacingMd,
-            AppTheme.spacingSm,
-            AppTheme.spacingMd,
+            AppTheme.spacingLg,
             AppTheme.spacingLg,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const ScreenHeader(
-                title: 'こんしゅうのボス',
-                subtitle: 'メインクエストたっせいで HP-1',
+                title: 'BOSS',
+                subtitle: 'メインクエスト達成で HP -1',
+                accentColor: AppColors.accentPurple,
               ),
               const SizedBox(height: AppTheme.spacingLg),
               _CurrentBossCard(boss: boss),
-              const SizedBox(height: AppTheme.spacingLg),
-              const _SectionTitle(title: 'とうばつのきろく'),
+              const SizedBox(height: AppTheme.spacingLg + 8),
+              _SectionDivider(label: 'DEFEATED  /  ${defeatedBosses.length}'),
               const SizedBox(height: AppTheme.spacingMd),
               if (defeatedBosses.isEmpty)
                 const _EmptyDefeated()
@@ -46,7 +47,7 @@ class BossScreen extends ConsumerWidget {
                 ...defeatedBosses.map(
                   (b) => Padding(
                     padding:
-                        const EdgeInsets.only(bottom: AppTheme.spacingSm),
+                        const EdgeInsets.only(bottom: AppTheme.spacingSm + 4),
                     child: _DefeatedBossTile(boss: b),
                   ),
                 ),
@@ -65,46 +66,59 @@ class _CurrentBossCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CommandWindow(
-      borderColor: AppColors.purple,
-      borderWidth: 3.5,
-      padding: const EdgeInsets.all(AppTheme.spacingLg),
+    return SlabCard(
+      accentColor: AppColors.accentPurple,
+      accentWidth: 6,
+      padding: const EdgeInsets.all(AppTheme.spacingLg + 4),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: AppColors.purple.withValues(alpha: 0.25),
-              border: Border.all(color: AppColors.purple, width: 3),
-            ),
-            child: Icon(
-              boss.defeated ? Icons.celebration_rounded : Icons.castle_rounded,
-              color: AppColors.purple,
-              size: 72,
+          Text('THIS  WEEK', style: AppTextStyles.statLabel),
+          const SizedBox(height: AppTheme.spacingMd),
+          Center(
+            child: Container(
+              width: 110,
+              height: 110,
+              decoration: BoxDecoration(
+                color: AppColors.accentPurple.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.accentPurple.withValues(alpha: 0.6),
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.accentPurple.withValues(alpha: 0.4),
+                    blurRadius: 24,
+                  ),
+                ],
+              ),
+              child: Icon(
+                boss.defeated
+                    ? Icons.celebration_rounded
+                    : Icons.castle_rounded,
+                color: AppColors.accentPurple,
+                size: 64,
+              ),
             ),
           ),
           const SizedBox(height: AppTheme.spacingMd),
           Text(
             boss.name,
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: AppColors.cream,
-            ),
+            style: AppTextStyles.headlineLarge,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppTheme.spacingXs),
+          const SizedBox(height: 4),
           Text(
-            '${boss.weekStartDate} 〜 ${boss.weekEndDate}',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.cream.withValues(alpha: 0.6),
-            ),
+            '${boss.weekStartDate}  〜  ${boss.weekEndDate}',
+            style: AppTextStyles.caption,
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingLg),
           HpBar(
             currentHp: boss.currentHp,
             maxHp: boss.maxHp,
-            height: 18,
-            onDark: true,
+            height: 12,
           ),
           const SizedBox(height: AppTheme.spacingMd),
           if (boss.defeated)
@@ -114,32 +128,60 @@ class _CurrentBossCard extends StatelessWidget {
                 vertical: AppTheme.spacingSm,
               ),
               decoration: BoxDecoration(
-                color: AppColors.gold,
-                border: Border.all(color: AppColors.cream, width: 2),
+                color: AppColors.accentYellow,
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.emoji_events_rounded,
-                      color: AppColors.brown, size: 20),
-                  const SizedBox(width: AppTheme.spacingXs),
+                      color: AppColors.textOnAccent, size: 18),
+                  const SizedBox(width: 6),
                   Text(
-                    'とうばつせいこう！',
-                    style: AppTextStyles.headlineMedium.copyWith(
-                      color: AppColors.brown,
+                    'DEFEATED',
+                    style: AppTextStyles.button.copyWith(
+                      color: AppColors.textOnAccent,
+                      fontSize: 14,
                     ),
                   ),
                 ],
               ),
             )
           else
-            Text(
-              'あと ${boss.currentHp}かい のメインたっせいで とうばつ！',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.cream,
+            Center(
+              child: Text(
+                'あと ${boss.currentHp} 回のメイン達成で討伐',
+                style: AppTextStyles.bodyMedium,
               ),
-              textAlign: TextAlign.center,
             ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionDivider extends StatelessWidget {
+  final String label;
+
+  const _SectionDivider({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.statLabel.copyWith(color: AppColors.accent),
+          ),
+          const SizedBox(width: AppTheme.spacingSm),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: AppColors.accent.withValues(alpha: 0.3),
+            ),
+          ),
         ],
       ),
     );
@@ -153,24 +195,24 @@ class _DefeatedBossTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CommandWindow(
-      borderColor: AppColors.gold.withValues(alpha: 0.5),
-      borderWidth: 2,
+    return SlabCard(
+      accentColor: AppColors.accentYellow,
+      accentWidth: 3,
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacingMd,
-        vertical: AppTheme.spacingSm,
+        vertical: AppTheme.spacingSm + 2,
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: AppColors.gold.withValues(alpha: 0.2),
-              border: Border.all(color: AppColors.gold, width: 1.5),
+              color: AppColors.accentYellow.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(6),
             ),
             child: const Icon(Icons.emoji_events_rounded,
-                color: AppColors.gold, size: 22),
+                color: AppColors.accentYellow, size: 20),
           ),
           const SizedBox(width: AppTheme.spacingMd),
           Expanded(
@@ -179,18 +221,12 @@ class _DefeatedBossTile extends StatelessWidget {
               children: [
                 Text(
                   boss.name,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    color: AppColors.cream,
-                  ),
+                  style: AppTextStyles.titleMedium,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  '${boss.weekStartDate} 〜',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.cream.withValues(alpha: 0.6),
-                  ),
-                ),
+                const SizedBox(height: 2),
+                Text(boss.weekStartDate, style: AppTextStyles.caption),
               ],
             ),
           ),
@@ -208,55 +244,20 @@ class _EmptyDefeated extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spacingLg),
       decoration: BoxDecoration(
-        color: AppColors.windowBg,
+        color: AppColors.surface.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: AppColors.cream.withValues(alpha: 0.3),
-          width: 2,
+          color: AppColors.textMuted.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.shield_outlined,
-            color: AppColors.cream.withValues(alpha: 0.7),
-            size: 32,
-          ),
+          Icon(Icons.shield_outlined, color: AppColors.textSecondary, size: 28),
           const SizedBox(width: AppTheme.spacingMd),
           Expanded(
             child: Text(
-              'まだ とうばつしたボスは いません。\nこんしゅうのボスを たおそう！',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.cream.withValues(alpha: 0.85),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String title;
-
-  const _SectionTitle({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 18,
-            color: AppColors.gold,
-          ),
-          const SizedBox(width: AppTheme.spacingSm),
-          Text(
-            title,
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: AppColors.cream,
+              'まだ討伐したボスはいません。\n今週のボスを倒そう。',
+              style: AppTextStyles.bodyMedium,
             ),
           ),
         ],

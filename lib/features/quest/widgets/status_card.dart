@@ -5,8 +5,8 @@ import 'package:tri_task/core/theme/app_colors.dart';
 import 'package:tri_task/core/theme/app_text_styles.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/providers/user_status_provider.dart';
-import 'package:tri_task/widgets/command_window.dart';
 import 'package:tri_task/widgets/exp_bar.dart';
+import 'package:tri_task/widgets/slab_card.dart';
 
 class StatusCard extends ConsumerWidget {
   const StatusCard({super.key});
@@ -15,42 +15,35 @@ class StatusCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userStatusNotifierProvider);
 
-    return CommandWindow(
+    return SlabCard(
+      accentColor: AppColors.accent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withValues(alpha: 0.2),
-                  border: Border.all(color: AppColors.gold, width: 2),
-                ),
-                child: const Icon(
-                  Icons.person_rounded,
-                  color: AppColors.gold,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(width: AppTheme.spacingMd),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'ぼうけんしゃ',
-                      style: AppTextStyles.statLabel.copyWith(
-                        color: AppColors.cream.withValues(alpha: 0.7),
-                      ),
-                    ),
+                    Text('ADVENTURER', style: AppTextStyles.statLabel),
                     const SizedBox(height: AppTheme.spacingXs),
-                    Text(
-                      'Lv. ${user.level}',
-                      style: AppTextStyles.statValue.copyWith(
-                        color: AppColors.gold,
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Lv',
+                          style: AppTextStyles.statValueSmall.copyWith(
+                            color: AppColors.accent,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${user.level}',
+                          style: AppTextStyles.statValue,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -58,11 +51,10 @@ class StatusCard extends ConsumerWidget {
               _StreakBadge(streakDays: user.streakDays),
             ],
           ),
-          const SizedBox(height: AppTheme.spacingMd),
+          const SizedBox(height: AppTheme.spacingLg),
           ExpBar(
             currentExp: user.exp,
             maxExp: ExpConstants.expPerLevel,
-            onDark: true,
           ),
         ],
       ),
@@ -80,26 +72,38 @@ class _StreakBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacingSm,
-        vertical: AppTheme.spacingXs,
+        vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: AppColors.gold,
-        border: Border.all(color: AppColors.cream, width: 1.5),
+        color: AppColors.accentYellow.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: AppColors.accentYellow.withValues(alpha: 0.5),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(
             Icons.local_fire_department_rounded,
-            color: AppColors.crimson,
-            size: 18,
+            color: AppColors.accentYellow,
+            size: 16,
           ),
           const SizedBox(width: 4),
           Text(
-            '$streakDays日',
+            '$streakDays',
+            style: AppTextStyles.statValueSmall.copyWith(
+              color: AppColors.accentYellow,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(width: 2),
+          Text(
+            'd',
             style: AppTextStyles.statLabel.copyWith(
-              color: AppColors.brown,
-              fontWeight: FontWeight.bold,
+              color: AppColors.accentYellow,
+              fontSize: 10,
             ),
           ),
         ],

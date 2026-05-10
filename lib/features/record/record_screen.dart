@@ -7,8 +7,8 @@ import 'package:tri_task/core/theme/app_theme.dart';
 import 'package:tri_task/core/utils/date_helper.dart';
 import 'package:tri_task/data/models/adventure_record.dart';
 import 'package:tri_task/providers/record_provider.dart';
-import 'package:tri_task/widgets/parchment_card.dart';
 import 'package:tri_task/widgets/screen_header.dart';
+import 'package:tri_task/widgets/slab_card.dart';
 
 class RecordScreen extends ConsumerStatefulWidget {
   const RecordScreen({super.key});
@@ -47,29 +47,33 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
         : recordMap[DateHelper.formatYmd(_selectedDay!)];
 
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
+            AppTheme.spacingLg,
             AppTheme.spacingMd,
-            AppTheme.spacingSm,
-            AppTheme.spacingMd,
+            AppTheme.spacingLg,
             AppTheme.spacingLg,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const ScreenHeader(
-                title: '冒険の記録',
-                subtitle: 'これまでの歩みを振り返ろう',
+                title: 'RECORD',
+                subtitle: 'これまでの冒険を振り返ろう',
               ),
               const SizedBox(height: AppTheme.spacingLg),
-              _MonthSummaryCard(
+              _MonthSummary(
                 achievedDays: monthAchievedDays,
                 totalExp: monthTotalExp,
               ),
               const SizedBox(height: AppTheme.spacingMd),
-              ParchmentCard(
+              SlabCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingSm,
+                  vertical: AppTheme.spacingSm,
+                ),
                 child: TableCalendar(
                   firstDay: DateTime.utc(2024),
                   lastDay: DateTime.utc(2030, 12, 31),
@@ -93,33 +97,39 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                     titleCentered: true,
                     formatButtonVisible: false,
                     titleTextStyle: AppTextStyles.titleMedium,
-                    leftChevronIcon:
-                        const Icon(Icons.chevron_left, color: AppColors.brown),
+                    leftChevronIcon: const Icon(Icons.chevron_left,
+                        color: AppColors.textSecondary),
                     rightChevronIcon: const Icon(Icons.chevron_right,
-                        color: AppColors.brown),
+                        color: AppColors.textSecondary),
                   ),
                   daysOfWeekStyle: DaysOfWeekStyle(
-                    weekdayStyle: AppTextStyles.caption.copyWith(
-                      fontWeight: FontWeight.bold,
+                    weekdayStyle: AppTextStyles.statLabel.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
                     ),
-                    weekendStyle: AppTextStyles.caption.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.crimson,
+                    weekendStyle: AppTextStyles.statLabel.copyWith(
+                      color: AppColors.accentRed,
+                      fontSize: 11,
                     ),
                   ),
                   calendarStyle: CalendarStyle(
                     outsideDaysVisible: false,
                     defaultTextStyle: AppTextStyles.bodyMedium,
                     weekendTextStyle: AppTextStyles.bodyMedium
-                        .copyWith(color: AppColors.crimson),
-                    selectedDecoration: const BoxDecoration(
-                      color: AppColors.blue,
-                      shape: BoxShape.circle,
+                        .copyWith(color: AppColors.accentRed),
+                    selectedDecoration: BoxDecoration(
+                      color: AppColors.accent,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    selectedTextStyle: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textOnAccent,
+                      fontWeight: FontWeight.bold,
                     ),
                     todayDecoration: BoxDecoration(
-                      color: AppColors.gold.withValues(alpha: 0.4),
-                      shape: BoxShape.circle,
+                      color: AppColors.accent.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(6),
                     ),
+                    todayTextStyle: AppTextStyles.bodyMedium,
                   ),
                   calendarBuilders: CalendarBuilders(
                     markerBuilder: (context, day, _) {
@@ -130,14 +140,20 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                         return const Positioned(
                           bottom: 2,
                           child: Icon(Icons.star_rounded,
-                              color: AppColors.gold, size: 14),
+                              color: AppColors.accentYellow, size: 12),
                         );
                       }
                       if (r.mainQuestCompleted) {
-                        return const Positioned(
-                          bottom: 2,
-                          child: Icon(Icons.local_fire_department_rounded,
-                              color: AppColors.crimson, size: 14),
+                        return Positioned(
+                          bottom: 4,
+                          child: Container(
+                            width: 5,
+                            height: 5,
+                            decoration: const BoxDecoration(
+                              color: AppColors.accentGreen,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         );
                       }
                       return null;
@@ -145,8 +161,8 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: AppTheme.spacingMd),
-              const _LegendCard(),
+              const SizedBox(height: AppTheme.spacingSm),
+              const _Legend(),
               const SizedBox(height: AppTheme.spacingMd),
               if (_selectedDay != null)
                 _SelectedDayDetail(
@@ -161,39 +177,38 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
   }
 }
 
-class _MonthSummaryCard extends StatelessWidget {
+class _MonthSummary extends StatelessWidget {
   final int achievedDays;
   final int totalExp;
 
-  const _MonthSummaryCard({
+  const _MonthSummary({
     required this.achievedDays,
     required this.totalExp,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ParchmentCard(
+    return SlabCard(
+      accentColor: AppColors.accent,
       child: Row(
         children: [
           Expanded(
-            child: _StatColumn(
-              label: '今月の達成日',
-              value: '$achievedDays日',
-              icon: Icons.local_fire_department_rounded,
-              iconColor: AppColors.crimson,
+            child: _Stat(
+              label: 'ACHIEVED  DAYS',
+              value: '$achievedDays',
+              accent: AppColors.accentGreen,
             ),
           ),
           Container(
-            width: 1.5,
+            width: 1,
             height: 40,
-            color: AppColors.border.withValues(alpha: 0.3),
+            color: AppColors.textMuted.withValues(alpha: 0.3),
           ),
           Expanded(
-            child: _StatColumn(
-              label: '今月の獲得EXP',
+            child: _Stat(
+              label: 'TOTAL  EXP',
               value: '$totalExp',
-              icon: Icons.bolt_rounded,
-              iconColor: AppColors.blue,
+              accent: AppColors.accent,
             ),
           ),
         ],
@@ -202,87 +217,62 @@ class _MonthSummaryCard extends StatelessWidget {
   }
 }
 
-class _StatColumn extends StatelessWidget {
+class _Stat extends StatelessWidget {
   final String label;
   final String value;
-  final IconData icon;
-  final Color iconColor;
+  final Color accent;
 
-  const _StatColumn({
+  const _Stat({
     required this.label,
     required this.value,
-    required this.icon,
-    required this.iconColor,
+    required this.accent,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: iconColor, size: 18),
-            const SizedBox(width: 4),
-            Text(value, style: AppTextStyles.statValue),
-          ],
+        Text(label, style: AppTextStyles.statLabel.copyWith(fontSize: 10)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.statValue.copyWith(
+            color: accent,
+            fontSize: 26,
+          ),
         ),
-        const SizedBox(height: 2),
-        Text(label, style: AppTextStyles.caption),
       ],
     );
   }
 }
 
-class _LegendCard extends StatelessWidget {
-  const _LegendCard();
+class _Legend extends StatelessWidget {
+  const _Legend();
 
   @override
   Widget build(BuildContext context) {
-    return const ParchmentCard(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppTheme.spacingMd,
-        vertical: AppTheme.spacingSm,
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _LegendItem(
-            icon: Icons.star_rounded,
-            color: AppColors.gold,
-            label: '完全達成',
+          const Icon(Icons.star_rounded,
+              color: AppColors.accentYellow, size: 14),
+          const SizedBox(width: 4),
+          Text('完全達成', style: AppTextStyles.caption),
+          const SizedBox(width: AppTheme.spacingMd),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(
+              color: AppColors.accentGreen,
+              shape: BoxShape.circle,
+            ),
           ),
-          _LegendItem(
-            icon: Icons.local_fire_department_rounded,
-            color: AppColors.crimson,
-            label: 'メイン達成',
-          ),
+          const SizedBox(width: 6),
+          Text('メイン達成', style: AppTextStyles.caption),
         ],
       ),
-    );
-  }
-}
-
-class _LegendItem extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-
-  const _LegendItem({
-    required this.icon,
-    required this.color,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color, size: 16),
-        const SizedBox(width: 4),
-        Text(label, style: AppTextStyles.caption),
-      ],
     );
   }
 }
@@ -295,64 +285,59 @@ class _SelectedDayDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = '${day.year}/${day.month}/${day.day}';
-    return ParchmentCard(
+    final dateStr =
+        '${day.year}.${day.month.toString().padLeft(2, '0')}.${day.day.toString().padLeft(2, '0')}';
+
+    return SlabCard(
+      accentColor: AppColors.textMuted,
+      accentWidth: 3,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(dateStr, style: AppTextStyles.titleMedium),
+          Text(dateStr,
+              style: AppTextStyles.statValueSmall.copyWith(fontSize: 18)),
           const SizedBox(height: AppTheme.spacingSm),
           if (record == null)
             Text('この日の記録はありません', style: AppTextStyles.caption)
           else ...[
             _DetailRow(
-              icon: record!.mainQuestCompleted
-                  ? Icons.check_circle
-                  : Icons.cancel_outlined,
-              iconColor: record!.mainQuestCompleted
-                  ? AppColors.blue
-                  : AppColors.disabled,
               label: 'メインクエスト',
               value: record!.mainQuestCompleted ? '達成' : '未達成',
+              valueColor: record!.mainQuestCompleted
+                  ? AppColors.accentGreen
+                  : AppColors.textMuted,
             ),
-            const SizedBox(height: AppTheme.spacingXs),
             _DetailRow(
-              icon: Icons.flag_outlined,
-              iconColor: AppColors.brown,
-              label: 'サイドクエスト達成数',
-              value: '${record!.sideQuestCompletedCount}件',
+              label: 'サイドクエスト',
+              value: '${record!.sideQuestCompletedCount} 件',
             ),
-            const SizedBox(height: AppTheme.spacingXs),
             _DetailRow(
-              icon: Icons.bolt_rounded,
-              iconColor: AppColors.blue,
-              label: '獲得EXP',
+              label: '獲得 EXP',
               value: '${record!.gainedExp}',
+              valueColor: AppColors.accent,
             ),
             if (record!.isPerfect) ...[
               const SizedBox(height: AppTheme.spacingSm),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppTheme.spacingSm,
-                  vertical: AppTheme.spacingXs,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.gold,
-                  border: Border.all(color: AppColors.brown, width: 1.5),
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.radiusSmall),
+                  color: AppColors.accentYellow,
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.star_rounded,
-                        size: 16, color: AppColors.brown),
+                        size: 14, color: AppColors.textOnAccent),
                     const SizedBox(width: 4),
                     Text(
-                      '完全達成日！',
-                      style: AppTextStyles.caption.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.brown,
+                      'PERFECT',
+                      style: AppTextStyles.statLabel.copyWith(
+                        color: AppColors.textOnAccent,
+                        fontSize: 10,
                       ),
                     ),
                   ],
@@ -367,33 +352,31 @@ class _SelectedDayDetail extends StatelessWidget {
 }
 
 class _DetailRow extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
   final String label;
   final String value;
+  final Color? valueColor;
 
   const _DetailRow({
-    required this.icon,
-    required this.iconColor,
     required this.label,
     required this.value,
+    this.valueColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: iconColor),
-        const SizedBox(width: AppTheme.spacingSm),
-        Expanded(child: Text(label, style: AppTextStyles.bodyMedium)),
-        Text(
-          value,
-          style: AppTextStyles.bodyMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: AppTextStyles.bodyMedium)),
+          Text(
+            value,
+            style: AppTextStyles.titleMedium.copyWith(
+              color: valueColor ?? AppColors.textPrimary,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

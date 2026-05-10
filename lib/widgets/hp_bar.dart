@@ -3,7 +3,7 @@ import 'package:tri_task/core/theme/app_colors.dart';
 import 'package:tri_task/core/theme/app_text_styles.dart';
 import 'package:tri_task/core/theme/app_theme.dart';
 
-/// 8bit風セグメントHPバー。
+/// 赤グロー付きHPバー。
 class HpBar extends StatelessWidget {
   final int currentHp;
   final int maxHp;
@@ -16,27 +16,16 @@ class HpBar extends StatelessWidget {
     required this.currentHp,
     required this.maxHp,
     super.key,
-    this.height = 14,
+    this.height = 8,
     this.showLabel = true,
     this.label = 'HP',
-    this.onDark = false,
+    this.onDark = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final labelColor = onDark
-        ? AppColors.cream.withValues(alpha: 0.85)
-        : AppColors.textSecondary;
-    final valueColor =
-        onDark ? AppColors.cream : AppColors.textPrimary;
-    final emptyColor = onDark
-        ? Colors.black.withValues(alpha: 0.45)
-        : AppColors.cream;
-    final borderColor =
-        onDark ? AppColors.gold : AppColors.border;
-
-    // HP は段数を maxHp に合わせる（7HPなら7セグメント）と分かりやすい
-    final segmentCount = maxHp.clamp(1, 20);
+    final ratio = maxHp > 0 ? (currentHp / maxHp).clamp(0.0, 1.0) : 0.0;
+    final radius = BorderRadius.circular(height / 2);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,10 +34,12 @@ class HpBar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: AppTextStyles.statLabel.copyWith(color: labelColor)),
+              Text(label, style: AppTextStyles.statLabel),
               Text(
                 '$currentHp / $maxHp',
-                style: AppTextStyles.statLabel.copyWith(color: valueColor),
+                style: AppTextStyles.statLabel.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ],
           ),
@@ -57,21 +48,34 @@ class HpBar extends StatelessWidget {
         Container(
           height: height,
           decoration: BoxDecoration(
-            color: emptyColor,
-            border: Border.all(color: borderColor, width: 2),
+            color: AppColors.surfaceMuted,
+            borderRadius: radius,
           ),
-          padding: const EdgeInsets.all(2),
-          child: Row(
-            children: List.generate(segmentCount, (i) {
-              final filled = i < currentHp;
-              return Expanded(
+          child: ClipRRect(
+            borderRadius: radius,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: ratio == 0 ? 0.001 : ratio,
+                heightFactor: 1.0,
                 child: Container(
-                  margin:
-                      EdgeInsets.only(right: i == segmentCount - 1 ? 0 : 1),
-                  color: filled ? AppColors.hpBar : Colors.transparent,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.accentRed.withValues(alpha: 0.9),
+                        AppColors.accentRed,
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accentRed.withValues(alpha: 0.55),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
                 ),
-              );
-            }),
+              ),
+            ),
           ),
         ),
       ],

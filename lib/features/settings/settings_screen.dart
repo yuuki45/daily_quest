@@ -12,8 +12,8 @@ import 'package:tri_task/providers/record_provider.dart';
 import 'package:tri_task/providers/user_status_provider.dart';
 import 'package:tri_task/services/hive_service.dart';
 import 'package:tri_task/services/notification_service.dart';
-import 'package:tri_task/widgets/parchment_card.dart';
 import 'package:tri_task/widgets/screen_header.dart';
+import 'package:tri_task/widgets/slab_card.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -21,43 +21,46 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
+            AppTheme.spacingLg,
             AppTheme.spacingMd,
-            AppTheme.spacingSm,
-            AppTheme.spacingMd,
+            AppTheme.spacingLg,
             AppTheme.spacingLg,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ScreenHeader(title: '設定'),
+              const ScreenHeader(title: 'SETTINGS'),
               const SizedBox(height: AppTheme.spacingLg),
-              const _SectionLabel(text: '通知'),
+              const _GroupLabel(label: 'NOTIFICATION'),
               const SizedBox(height: AppTheme.spacingSm),
-              const ParchmentCard(
+              SlabCard(
+                accentColor: AppColors.accent,
                 padding: EdgeInsets.zero,
-                child: _NotificationToggle(),
+                child: const _NotificationToggle(),
               ),
               const SizedBox(height: AppTheme.spacingLg),
-              const _SectionLabel(text: 'データ'),
+              const _GroupLabel(label: 'DATA'),
               const SizedBox(height: AppTheme.spacingSm),
-              ParchmentCard(
+              SlabCard(
+                accentColor: AppColors.accentRed,
                 padding: EdgeInsets.zero,
                 child: _SettingsTile(
                   icon: Icons.delete_outline_rounded,
-                  iconColor: AppColors.crimson,
+                  iconColor: AppColors.accentRed,
                   title: 'すべてのデータをリセット',
                   subtitle: 'クエスト・レベル・ボス・記録が全て削除されます',
                   onTap: () => _confirmReset(context, ref),
                 ),
               ),
               const SizedBox(height: AppTheme.spacingLg),
-              const _SectionLabel(text: 'このアプリについて'),
+              const _GroupLabel(label: 'ABOUT'),
               const SizedBox(height: AppTheme.spacingSm),
-              ParchmentCard(
+              SlabCard(
+                accentColor: AppColors.textMuted,
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [
@@ -82,12 +85,14 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: AppTheme.spacingLg),
-              Text(
-                'Daily Quest',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.cream.withValues(alpha: 0.5),
+              Center(
+                child: Text(
+                  'Daily Quest',
+                  style: AppTextStyles.statLabel.copyWith(
+                    color: AppColors.textMuted,
+                    fontSize: 11,
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -100,10 +105,9 @@ class SettingsScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.cream,
+        backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          side: const BorderSide(color: AppColors.border, width: 2),
+          borderRadius: BorderRadius.circular(12),
         ),
         title: Text('データをリセット', style: AppTextStyles.titleMedium),
         content: Text(
@@ -113,17 +117,13 @@ class SettingsScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(
-              'キャンセル',
-              style: AppTextStyles.button.copyWith(color: AppColors.brown),
-            ),
+            child: Text('キャンセル',
+                style: TextStyle(color: AppColors.textSecondary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              '削除する',
-              style: AppTextStyles.button.copyWith(color: AppColors.crimson),
-            ),
+            child: const Text('削除する',
+                style: TextStyle(color: AppColors.accentRed)),
           ),
         ],
       ),
@@ -145,7 +145,7 @@ class SettingsScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('データをリセットしました', style: AppTextStyles.bodyMedium),
-          backgroundColor: AppColors.brown,
+          backgroundColor: AppColors.surfaceVariant,
         ),
       );
     }
@@ -155,8 +155,22 @@ class SettingsScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$label は準備中です', style: AppTextStyles.bodyMedium),
-        backgroundColor: AppColors.brown,
+        backgroundColor: AppColors.surfaceVariant,
       ),
+    );
+  }
+}
+
+class _GroupLabel extends StatelessWidget {
+  final String label;
+
+  const _GroupLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: AppTheme.spacingSm),
+      child: Text(label, style: AppTextStyles.statLabel),
     );
   }
 }
@@ -203,7 +217,7 @@ class _NotificationToggleState extends State<_NotificationToggle> {
               '通知が許可されませんでした。端末の設定から有効にしてください。',
               style: AppTextStyles.bodyMedium,
             ),
-            backgroundColor: AppColors.brown,
+            backgroundColor: AppColors.surfaceVariant,
           ),
         );
       }
@@ -218,12 +232,12 @@ class _NotificationToggleState extends State<_NotificationToggle> {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacingMd,
-        vertical: AppTheme.spacingSm,
+        vertical: AppTheme.spacingMd,
       ),
       child: Row(
         children: [
           const Icon(Icons.notifications_outlined,
-              color: AppColors.brown, size: 22),
+              color: AppColors.accent, size: 22),
           const SizedBox(width: AppTheme.spacingMd),
           Expanded(
             child: Column(
@@ -231,10 +245,8 @@ class _NotificationToggleState extends State<_NotificationToggle> {
               children: [
                 Text('21:00 にリマインド', style: AppTextStyles.titleMedium),
                 const SizedBox(height: 2),
-                Text(
-                  '毎日21時に「冒険を記録しよう」と通知',
-                  style: AppTextStyles.caption,
-                ),
+                Text('毎日21時に「冒険を記録しよう」と通知',
+                    style: AppTextStyles.caption),
               ],
             ),
           ),
@@ -248,8 +260,8 @@ class _NotificationToggleState extends State<_NotificationToggle> {
             Switch.adaptive(
               value: value,
               onChanged: _toggle,
-              activeThumbColor: AppColors.gold,
-              activeTrackColor: AppColors.gold.withValues(alpha: 0.4),
+              activeThumbColor: AppColors.accent,
+              activeTrackColor: AppColors.accent.withValues(alpha: 0.4),
             ),
         ],
       ),
@@ -287,7 +299,7 @@ class _SettingsTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(icon, color: iconColor ?? AppColors.brown, size: 22),
+              Icon(icon, color: iconColor ?? AppColors.textSecondary, size: 22),
               const SizedBox(width: AppTheme.spacingMd),
               Expanded(
                 child: Column(
@@ -307,10 +319,11 @@ class _SettingsTile extends StatelessWidget {
                 ),
               ),
               if (trailingText != null)
-                Text(trailingText!, style: AppTextStyles.bodyMedium),
+                Text(trailingText!,
+                    style: AppTextStyles.statLabel.copyWith(fontSize: 12)),
               if (onTap != null && trailingText == null)
                 Icon(Icons.chevron_right,
-                    color: AppColors.brown.withValues(alpha: 0.5)),
+                    color: AppColors.textMuted),
             ],
           ),
         ),
@@ -328,24 +341,7 @@ class _Divider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingMd),
       child: Container(
         height: 1,
-        color: AppColors.border.withValues(alpha: 0.2),
-      ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String text;
-
-  const _SectionLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
-      child: Text(
-        text,
-        style: AppTextStyles.statLabel.copyWith(color: AppColors.cream),
+        color: AppColors.textMuted.withValues(alpha: 0.2),
       ),
     );
   }

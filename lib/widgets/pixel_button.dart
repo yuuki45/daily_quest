@@ -5,7 +5,8 @@ import 'package:tri_task/core/theme/app_theme.dart';
 
 enum PixelButtonVariant { primary, secondary, danger }
 
-/// レトロRPG風ボタン。ハードシャドウで「凸面」感を出す。
+/// モダンスタイリッシュなアクションボタン。
+/// (旧称 PixelButton, 互換のため名前は残す)
 class PixelButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -25,28 +26,28 @@ class PixelButton extends StatelessWidget {
   Color get _backgroundColor {
     switch (variant) {
       case PixelButtonVariant.primary:
-        return AppColors.blue;
+        return AppColors.accent;
       case PixelButtonVariant.secondary:
-        return AppColors.gold;
+        return AppColors.accentYellow;
       case PixelButtonVariant.danger:
-        return AppColors.crimson;
+        return AppColors.accentRed;
     }
   }
 
   Color get _foregroundColor {
     switch (variant) {
       case PixelButtonVariant.primary:
-      case PixelButtonVariant.danger:
-        return AppColors.cream;
       case PixelButtonVariant.secondary:
-        return AppColors.brown;
+        return AppColors.textOnAccent;
+      case PixelButtonVariant.danger:
+        return AppColors.textPrimary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final disabled = onPressed == null;
-    final radius = BorderRadius.circular(AppTheme.radiusMedium);
+    final radius = BorderRadius.circular(8);
 
     return Opacity(
       opacity: disabled ? 0.5 : 1.0,
@@ -67,16 +68,13 @@ class PixelButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: _backgroundColor,
               borderRadius: radius,
-              border: Border.all(
-                color: AppColors.border,
-                width: AppTheme.borderWidth,
-              ),
               boxShadow: disabled
                   ? null
                   : [
                       BoxShadow(
-                        color: AppColors.brown.withValues(alpha: 0.35),
-                        offset: const Offset(0, 3),
+                        color: _backgroundColor.withValues(alpha: 0.45),
+                        blurRadius: 18,
+                        offset: const Offset(0, 4),
                       ),
                     ],
             ),

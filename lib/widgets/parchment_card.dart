@@ -40,7 +40,7 @@ class ParchmentCard extends StatelessWidget {
         borderRadius: br,
         border: Border.all(
           color: borderColor ?? AppColors.border,
-          width: borderWidth ?? AppTheme.borderWidth,
+          width: borderWidth ?? 2.0,
         ),
       ),
       child: child,

@@ -50,15 +50,12 @@ class _QuestEditSheetState extends ConsumerState<QuestEditSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.cream,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AppTheme.radiusLarge),
-          ),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           border: Border(
-            top: BorderSide(color: AppColors.border, width: 2),
-            left: BorderSide(color: AppColors.border, width: 2),
-            right: BorderSide(color: AppColors.border, width: 2),
+            top: BorderSide(
+                color: AppColors.accent.withValues(alpha: 0.6), width: 2),
           ),
         ),
         padding: const EdgeInsets.all(AppTheme.spacingLg),
@@ -68,27 +65,28 @@ class _QuestEditSheetState extends ConsumerState<QuestEditSheet> {
           children: [
             Center(
               child: Container(
-                width: 40,
+                width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.brown.withValues(alpha: 0.3),
+                  color: AppColors.textMuted,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
             const SizedBox(height: AppTheme.spacingMd),
-            Text('クエストを追加',
-                style: AppTextStyles.headlineMedium,
-                textAlign: TextAlign.center),
+            Text('NEW  QUEST', style: AppTextStyles.statLabel),
+            const SizedBox(height: 4),
+            Text('クエストを追加', style: AppTextStyles.headlineLarge),
             const SizedBox(height: AppTheme.spacingLg),
-            Text('種類', style: AppTextStyles.statLabel),
+            Text('TYPE', style: AppTextStyles.statLabel),
             const SizedBox(height: AppTheme.spacingSm),
             Row(
               children: [
                 Expanded(
                   child: _TypeChip(
-                    label: 'メインクエスト',
+                    label: 'メイン',
                     icon: Icons.star_rounded,
+                    accent: AppColors.accentYellow,
                     selected: _selectedType == QuestType.main,
                     enabled: canMain || _selectedType == QuestType.main,
                     onTap: canMain
@@ -99,8 +97,9 @@ class _QuestEditSheetState extends ConsumerState<QuestEditSheet> {
                 const SizedBox(width: AppTheme.spacingSm),
                 Expanded(
                   child: _TypeChip(
-                    label: 'サイドクエスト',
+                    label: 'サイド',
                     icon: Icons.flag_outlined,
+                    accent: AppColors.accent,
                     selected: _selectedType == QuestType.side,
                     enabled: canSide || _selectedType == QuestType.side,
                     onTap: canSide
@@ -111,45 +110,41 @@ class _QuestEditSheetState extends ConsumerState<QuestEditSheet> {
               ],
             ),
             const SizedBox(height: AppTheme.spacingLg),
-            Text('クエスト名', style: AppTextStyles.statLabel),
+            Text('TITLE', style: AppTextStyles.statLabel),
             const SizedBox(height: AppTheme.spacingSm),
             TextField(
               controller: _controller,
               autofocus: true,
               maxLength: 60,
               style: AppTextStyles.bodyLarge,
+              cursorColor: AppColors.accent,
               decoration: InputDecoration(
                 hintText: '例: アプリのLPを30分作る',
                 hintStyle: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.disabled),
+                    .copyWith(color: AppColors.textMuted),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppColors.background,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppTheme.spacingMd,
                   vertical: AppTheme.spacingMd,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  borderSide: const BorderSide(
-                    color: AppColors.border,
-                    width: 2,
-                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  borderSide: const BorderSide(
-                    color: AppColors.border,
-                    width: 2,
-                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: const BorderSide(
-                    color: AppColors.blue,
-                    width: 2.5,
+                    color: AppColors.accent,
+                    width: 2,
                   ),
                 ),
                 errorText: _errorText,
+                errorStyle: TextStyle(color: AppColors.accentRed),
               ),
               onChanged: (_) {
                 if (_errorText != null) setState(() => _errorText = null);
@@ -158,7 +153,7 @@ class _QuestEditSheetState extends ConsumerState<QuestEditSheet> {
             ),
             const SizedBox(height: AppTheme.spacingMd),
             PixelButton(
-              label: '追加する',
+              label: 'ADD',
               icon: Icons.add_rounded,
               onPressed: _submit,
               fullWidth: true,
@@ -190,6 +185,7 @@ class _QuestEditSheetState extends ConsumerState<QuestEditSheet> {
 class _TypeChip extends StatelessWidget {
   final String label;
   final IconData icon;
+  final Color accent;
   final bool selected;
   final bool enabled;
   final VoidCallback? onTap;
@@ -197,6 +193,7 @@ class _TypeChip extends StatelessWidget {
   const _TypeChip({
     required this.label,
     required this.icon,
+    required this.accent,
     required this.selected,
     required this.enabled,
     required this.onTap,
@@ -205,19 +202,21 @@ class _TypeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = selected
-        ? AppColors.gold
-        : (enabled ? Colors.white : AppColors.disabled.withValues(alpha: 0.3));
-    final fg = selected
-        ? AppColors.brown
-        : (enabled ? AppColors.brown : AppColors.disabled);
+        ? accent.withValues(alpha: 0.18)
+        : AppColors.background;
+    final borderColor = selected
+        ? accent
+        : (enabled
+            ? AppColors.textMuted.withValues(alpha: 0.4)
+            : AppColors.textMuted.withValues(alpha: 0.2));
 
     return Opacity(
-      opacity: enabled ? 1.0 : 0.6,
+      opacity: enabled ? 1.0 : 0.5,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          borderRadius: BorderRadius.circular(8),
           child: Container(
             padding: const EdgeInsets.symmetric(
               vertical: AppTheme.spacingMd,
@@ -225,24 +224,21 @@ class _TypeChip extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: bg,
-              border: Border.all(
-                color: selected ? AppColors.brown : AppColors.border,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor, width: 2),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, color: fg, size: 22),
-                const SizedBox(height: 4),
+                Icon(icon,
+                    color: selected ? accent : AppColors.textSecondary,
+                    size: 22),
+                const SizedBox(height: 6),
                 Text(
                   label,
-                  style: AppTextStyles.caption.copyWith(
-                    color: fg,
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: selected ? accent : AppColors.textSecondary,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),

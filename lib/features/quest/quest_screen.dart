@@ -12,7 +12,7 @@ import 'package:tri_task/features/quest/widgets/quest_edit_sheet.dart';
 import 'package:tri_task/features/quest/widgets/status_card.dart';
 import 'package:tri_task/providers/quest_provider.dart';
 
-const _weekdayJp = ['月', '火', '水', '木', '金', '土', '日'];
+const _weekdayJp = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
 class QuestScreen extends ConsumerWidget {
   const QuestScreen({super.key});
@@ -30,13 +30,13 @@ class QuestScreen extends ConsumerWidget {
     final canAddMore = mainQuest == null || sideQuests.length < 2;
 
     return Scaffold(
-      backgroundColor: AppColors.navy,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
+            AppTheme.spacingLg,
             AppTheme.spacingMd,
-            AppTheme.spacingSm,
-            AppTheme.spacingMd,
+            AppTheme.spacingLg,
             96,
           ),
           child: Column(
@@ -47,8 +47,9 @@ class QuestScreen extends ConsumerWidget {
               const StatusCard(),
               const SizedBox(height: AppTheme.spacingMd),
               const BossSummaryCard(),
-              const SizedBox(height: AppTheme.spacingLg),
-              const _SectionTitle(title: '今日のクエスト'),
+              const SizedBox(height: AppTheme.spacingLg + 8),
+              _SectionTitle(
+                  label: 'TODAY / QUEST', count: quests.length, max: 3),
               const SizedBox(height: AppTheme.spacingMd),
               if (mainQuest == null)
                 _MainQuestPlaceholder(
@@ -56,12 +57,12 @@ class QuestScreen extends ConsumerWidget {
                 )
               else
                 QuestCard(quest: mainQuest),
-              const SizedBox(height: AppTheme.spacingMd),
+              const SizedBox(height: AppTheme.spacingSm + 4),
               if (sideQuests.isNotEmpty)
                 ...sideQuests.map(
                   (q) => Padding(
                     padding:
-                        const EdgeInsets.only(bottom: AppTheme.spacingSm),
+                        const EdgeInsets.only(bottom: AppTheme.spacingSm + 4),
                     child: QuestCard(quest: q),
                   ),
                 )
@@ -74,19 +75,28 @@ class QuestScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: canAddMore
-          ? FloatingActionButton(
-              backgroundColor: AppColors.gold,
-              foregroundColor: AppColors.brown,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                side: const BorderSide(color: AppColors.brown, width: 2),
+          ? Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.accent.withValues(alpha: 0.6),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              onPressed: () {
-                HapticFeedback.lightImpact();
-                _openEditSheet(context, null);
-              },
-              child: const Icon(Icons.add_rounded, size: 32),
+              child: FloatingActionButton(
+                backgroundColor: AppColors.accent,
+                foregroundColor: AppColors.textOnAccent,
+                elevation: 0,
+                shape: const CircleBorder(),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  _openEditSheet(context, null);
+                },
+                child: const Icon(Icons.add_rounded, size: 32),
+              ),
             )
           : null,
     );
@@ -108,7 +118,8 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final dateText = '${now.month}/${now.day}（${_weekdayJp[now.weekday - 1]}）';
+    final dateText =
+        '${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}  ${_weekdayJp[now.weekday - 1]}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
@@ -121,25 +132,21 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   AppConstants.appName,
-                  style: AppTextStyles.displayLarge.copyWith(
-                    color: AppColors.cream,
-                  ),
+                  style: AppTextStyles.displayLarge,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   AppConstants.appTagline,
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.cream.withValues(alpha: 0.75),
-                  ),
+                  style: AppTextStyles.caption,
                 ),
               ],
             ),
           ),
           Text(
             dateText,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.gold,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.statLabel.copyWith(
+              color: AppColors.accent,
+              fontSize: 12,
             ),
           ),
         ],
@@ -149,26 +156,43 @@ class _Header extends StatelessWidget {
 }
 
 class _SectionTitle extends StatelessWidget {
-  final String title;
+  final String label;
+  final int count;
+  final int max;
 
-  const _SectionTitle({required this.title});
+  const _SectionTitle({
+    required this.label,
+    required this.count,
+    required this.max,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingSm),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 4,
-            height: 18,
-            color: AppColors.gold,
+          Text(
+            label,
+            style: AppTextStyles.statLabel.copyWith(
+              color: AppColors.accent,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacingSm),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: AppColors.accent.withValues(alpha: 0.3),
+            ),
           ),
           const SizedBox(width: AppTheme.spacingSm),
           Text(
-            title,
-            style: AppTextStyles.headlineMedium.copyWith(
-              color: AppColors.cream,
+            '$count / $max',
+            style: AppTextStyles.statLabel.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 11,
             ),
           ),
         ],
@@ -188,23 +212,24 @@ class _MainQuestPlaceholder extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.all(AppTheme.spacingLg),
           decoration: BoxDecoration(
-            color: AppColors.cream.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            color: AppColors.surface.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: AppColors.gold.withValues(alpha: 0.6),
-              width: 2,
+              color: AppColors.accentYellow.withValues(alpha: 0.4),
+              width: 1.5,
+              strokeAlign: BorderSide.strokeAlignInside,
             ),
           ),
           child: Row(
             children: [
-              const Icon(
-                Icons.add_circle_outline_rounded,
-                color: AppColors.gold,
-                size: 32,
+              Icon(
+                Icons.add_rounded,
+                color: AppColors.accentYellow,
+                size: 28,
               ),
               const SizedBox(width: AppTheme.spacingMd),
               Expanded(
@@ -212,17 +237,16 @@ class _MainQuestPlaceholder extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'メインクエストを追加',
-                      style: AppTextStyles.titleMedium.copyWith(
-                        color: AppColors.cream,
+                      'MAIN  QUEST',
+                      style: AppTextStyles.statLabel.copyWith(
+                        color: AppColors.accentYellow,
+                        fontSize: 11,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
-                      '今日一番やるべきタスクを1つ',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.cream.withValues(alpha: 0.7),
-                      ),
+                      'タップしてメインクエストを設定',
+                      style: AppTextStyles.titleMedium,
                     ),
                   ],
                 ),
@@ -246,30 +270,33 @@ class _SideQuestHint extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding: const EdgeInsets.all(AppTheme.spacingMd),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacingMd,
+            vertical: AppTheme.spacingMd,
+          ),
           decoration: BoxDecoration(
-            color: AppColors.cream.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            color: AppColors.surface.withValues(alpha: 0.4),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: AppColors.cream.withValues(alpha: 0.3),
-              width: 1.5,
+              color: AppColors.textMuted.withValues(alpha: 0.4),
+              width: 1,
             ),
           ),
           child: Row(
             children: [
               Icon(
-                Icons.flag_outlined,
-                color: AppColors.cream.withValues(alpha: 0.7),
-                size: 24,
+                Icons.add_rounded,
+                color: AppColors.textSecondary,
+                size: 20,
               ),
               const SizedBox(width: AppTheme.spacingSm),
               Expanded(
                 child: Text(
                   'サイドクエストを追加（最大2件）',
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.cream.withValues(alpha: 0.8),
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
